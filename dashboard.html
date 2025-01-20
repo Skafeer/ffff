@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم التاجر</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <?php include 'includes/header.php'; ?>
+    <main>
+        <h2>إضافة طلب جديد</h2>
+        <form action="php/submit_order.php" method="POST">
+            <label for="product">اسم المنتج:</label>
+            <input type="text" id="product" name="product" required>
+
+            <label for="price">سعر البيع:</label>
+            <input type="number" id="price" name="price" required>
+
+            <label for="customer_name">اسم الزبون:</label>
+            <input type="text" id="customer_name" name="customer_name" required>
+
+            <label for="customer_phone">رقم الهاتف:</label>
+            <input type="tel" id="customer_phone" name="customer_phone" required>
+
+            <button type="submit">إضافة الطلب</button>
+        </form>
+    </main>
+    <?php include 'includes/footer.php'; ?>
+</body>
+</html>
