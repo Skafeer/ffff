@@ -496,7 +496,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="data.js"></script>
     <script>
         // دالة مساعدة لتحويل الثواني إلى تنسيق دقائق:ثواني
         function formatDuration(seconds) {
@@ -619,37 +618,7 @@
             });
         }
 
-        // دالة لاختبار اتصال مباشر
-        function testDirectConnection(url) {
-            return new Promise((resolve, reject) => {
-                const testVideo = document.createElement('video');
-                testVideo.src = url;
-                
-                const onError = () => {
-                    testVideo.removeEventListener('error', onError);
-                    testVideo.removeEventListener('canplay', onCanPlay);
-                    reject(new Error('Direct connection failed'));
-                };
-                
-                const onCanPlay = () => {
-                    testVideo.removeEventListener('error', onError);
-                    testVideo.removeEventListener('canplay', onCanPlay);
-                    resolve();
-                };
-                
-                testVideo.addEventListener('error', onError);
-                testVideo.addEventListener('canplay', onCanPlay);
-                
-                // مهلة 5 ثواني
-                setTimeout(() => {
-                    testVideo.removeEventListener('error', onError);
-                    testVideo.removeEventListener('canplay', onCanPlay);
-                    reject(new Error('Timeout'));
-                }, 5000);
-            });
-        }
-
-        // دالة لتشغيل المحاضرة
+        // دالة لتشغيل المحاضرة باستخدام بروكسي متطور
         async function playLecture(url, title, uniqueKey) {
             const videoPlayer = document.getElementById('video-player');
             const videoTitle = document.getElementById('video-title');
@@ -669,55 +638,34 @@
             videoPlayer.pause();
             videoPlayer.src = '';
             
-            // 1. محاولة الاتصال المباشر
+            // استخدم بروكسي Cloudflare Worker مع إضافة الرؤوس المطلوبة
+            const proxyUrl = `https://abwaab-proxy.ss9758026.workers.dev/?url=${encodeURIComponent(url)}`;
+            
             try {
-                await testDirectConnection(url);
-                proxyStatus.textContent = "متصل مباشرة";
-                setupVideoPlayer(url, storageKey);
-                return;
+                // التحقق من عمل البروكسي قبل التحميل
+                const testResponse = await fetch(proxyUrl, { method: 'HEAD' });
+                if (testResponse.ok) {
+                    proxyStatus.textContent = "متصل عبر البروكسي الآمن";
+                    setupVideoPlayer(proxyUrl, storageKey);
+                } else {
+                    throw new Error('Proxy not responding');
+                }
             } catch (error) {
-                console.log("فشل الاتصال المباشر: ", error.message);
+                console.error("فشل الاتصال بالبروكسي:", error);
+                proxyStatus.textContent = "فشل الاتصال - جرب بديل";
+                proxyStatus.style.color = "#f44336";
+                
+                // محاولة بديلة باستخدام بروكسي CORS Anywhere
+                try {
+                    const corsProxyUrl = `https://cors-anywhere.herokuapp.com/${url}`;
+                    proxyStatus.textContent = "جرب الاتصال عبر بديل";
+                    setupVideoPlayer(corsProxyUrl, storageKey);
+                } catch (fallbackError) {
+                    console.error("فشل البديل أيضًا:", fallbackError);
+                    proxyStatus.textContent = "فشل الاتصال - حاول لاحقاً";
+                    showAlternativeOptions(url, title);
+                }
             }
-            
-            // 2. استخدام بروكسي Cloudflare
-            try {
-                const proxyUrl1 = `https://abwaab-proxy.ss9758026.workers.dev/?url=${encodeURIComponent(url)}`;
-                await testDirectConnection(proxyUrl1);
-                proxyStatus.textContent = "متصل عبر Cloudflare Proxy";
-                setupVideoPlayer(proxyUrl1, storageKey);
-                return;
-            } catch (error) {
-                console.log("فشل بروكسي Cloudflare: ", error.message);
-            }
-            
-            // 3. استخدام بروكسي CORS Anywhere
-            try {
-                const proxyUrl2 = `https://cors-anywhere.herokuapp.com/${url}`;
-                await testDirectConnection(proxyUrl2);
-                proxyStatus.textContent = "متصل عبر CORS Anywhere";
-                setupVideoPlayer(proxyUrl2, storageKey);
-                return;
-            } catch (error) {
-                console.log("فشل بروكسي CORS Anywhere: ", error.message);
-            }
-            
-            // 4. استخدام بروكسي CORS Bypass
-            try {
-                const proxyUrl3 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                await testDirectConnection(proxyUrl3);
-                proxyStatus.textContent = "متصل عبر CORS Bypass";
-                setupVideoPlayer(proxyUrl3, storageKey);
-                return;
-            } catch (error) {
-                console.log("فشل بروكسي CORS Bypass: ", error.message);
-            }
-            
-            // فشلت جميع المحاولات
-            proxyStatus.textContent = "فشل الاتصال - حاول لاحقاً";
-            proxyStatus.style.color = "#f44336";
-            
-            // عرض خيارات بديلة
-            showAlternativeOptions(url, title);
         }
 
         function showAlternativeOptions(url, title) {
@@ -762,8 +710,10 @@
                 const hls = new Hls({
                     debug: false,
                     xhrSetup: function(xhr) {
+                        // إضافة رؤوس المصادقة المطلوبة لمنصة "أبواب"
                         xhr.setRequestHeader('Referer', 'https://abwaab.com/');
                         xhr.setRequestHeader('Origin', 'https://abwaab.com');
+                        xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36');
                     }
                 });
                 
