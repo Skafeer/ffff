@@ -3,262 +3,987 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أيون أكاديمي - المنصة التعليمية المتكاملة</title>
+    <title>منصة الدروس - أبواب 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    <link rel="stylesheet" href="style.css">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 3px solid #ff9800;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .teacher-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .teacher-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .teacher-header {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .teacher-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ff9800;
+            margin-left: 20px;
+        }
+        
+        .teacher-info {
+            flex: 1;
+        }
+        
+        .teacher-name {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #ffc107;
+        }
+        
+        .teacher-subject {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .classes-container {
+            padding: 1.5rem;
+        }
+        
+        .class-title {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #ff9800;
+            display: inline-block;
+            color: #4fc3f7;
+        }
+        
+        .lectures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .lecture-card {
+            background: rgba(30, 30, 40, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+        
+        .lecture-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 152, 0, 0.7);
+        }
+        
+        .lecture-thumb {
+            width: 120px;
+            background: linear-gradient(135deg, #ff9800, #ff5722);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .lecture-content {
+            flex: 1;
+            padding: 1.2rem;
+        }
+        
+        .lecture-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: #e1f5fe;
+        }
+        
+        .lecture-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+        }
+        
+        .lecture-duration, .lecture-status {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+        
+        .lecture-duration i, .lecture-status i {
+            margin-left: 5px;
+        }
+        
+        .watch-btn {
+            background: linear-gradient(to right, #2196F3, #21CBF3);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .watch-btn i {
+            margin-left: 8px;
+        }
+        
+        .watch-btn:hover {
+            background: linear-gradient(to right, #1e88e5, #00b0ff);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .progress-container {
+            margin: 1rem 0 0.8rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9800, #ff5722);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .video-container {
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            display: none;
+            margin-top: 2rem;
+            border: 2px solid #ff9800;
+        }
+        
+        .video-header {
+            padding: 1.2rem;
+            background: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid rgba(255, 152, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .video-title {
+            font-size: 1.5rem;
+            color: #ffc107;
+        }
+        
+        .close-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .close-btn:hover {
+            background: #d32f2f;
+            transform: rotate(90deg);
+        }
+        
+        .video-wrapper {
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        
+        #video-player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+        
+        .video-controls {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            border-top: 1px solid rgba(255, 152, 0, 0.3);
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 152, 0, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .progress-container {
+            flex: 1;
+            margin: 0 15px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .video-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2196F3, #21CBF3);
+            border-radius: 4px;
+            width: 0;
+            transition: width 0.2s;
+        }
+        
+        .progress-time {
+            min-width: 100px;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .proxy-status {
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.6);
+            border-top: 1px solid rgba(255, 152, 0, 0.3);
+            text-align: center;
+            font-size: 0.9rem;
+            color: #81c784;
+        }
+        
+        .proxy-server {
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+        
+        .alt-options {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 500px;
+            border: 2px solid #f44336;
+        }
+        
+        .alt-options h3 {
+            color: #f44336;
+            margin-bottom: 1rem;
+        }
+        
+        .alt-options p {
+            margin-bottom: 1.5rem;
+            color: #e0e0e0;
+        }
+        
+        .alt-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .alt-btn {
+            background: linear-gradient(to right, #2196F3, #21CBF3);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .alt-btn i {
+            margin-left: 8px;
+        }
+        
+        .alt-btn:hover {
+            background: linear-gradient(to right, #1e88e5, #00b0ff);
+            transform: scale(1.05);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .lectures-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .teacher-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .teacher-image {
+                margin: 0 0 15px 0;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .video-controls {
+                flex-wrap: wrap;
+                padding: 0.5rem;
+            }
+            
+            .progress-container {
+                order: 3;
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .alt-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- شريط التنقل العلوي -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="logo">
-                <i class="fas fa-atom"></i>
-                <h1>أيون أكاديمي</h1>
-            </div>
-            <div class="nav-links">
-                <a href="#" class="active">الرئيسية</a>
-                <a href="#" id="nav-teachers">المعلمين</a>
-                <a href="#" id="nav-classes">الفصول</a>
-                <a href="#">تواصل معنا</a>
-            </div>
-            <div class="mobile-menu">
-                <i class="fas fa-bars"></i>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> منصة الدروس - أبواب 2026</h1>
+            <p>جميع محاضراتك في مكان واحد مع نظام متابعة متقدم</p>
         </div>
-    </nav>
-
-    <!-- قسم البانر الرئيسي -->
-    <header class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h2>التميز التعليمي في متناول يديك</h2>
-                <p>انضم إلى منصة أيون أكاديمي لتجربة تعليمية فريدة مع أفضل المعلمين وأحدث المناهج التعليمية</p>
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="ابحث عن محاضرة أو معلم...">
-                    <button id="search-btn"><i class="fas fa-search"></i></button>
-                </div>
-                <div class="stats">
-                    <div class="stat">
-                        <h3>350+</h3>
-                        <p>محاضرة</p>
-                    </div>
-                    <div class="stat">
-                        <h3>14</h3>
-                        <p>مدرس متخصص</p>
-                    </div>
-                    <div class="stat">
-                        <h3>20+</h3>
-                        <p>مادة دراسية</p>
-                    </div>
-                </div>
+        
+        <div id="teachers-container"></div>
+        
+        <div class="video-container">
+            <div class="video-header">
+                <h2 id="video-title"></h2>
+                <button class="close-btn" id="close-video">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </div>
-    </header>
-
-    <!-- محتوى الصفحة الرئيسية -->
-    <main class="container">
-        <!-- قسم المواد الدراسية -->
-        <section class="subjects" id="subjects-section">
-            <h2 class="section-title">المواد الدراسية</h2>
-            <div class="subject-grid" id="subjects-container">
-                <!-- سيتم ملء هذا القسم بالبيانات من ملف app.js -->
+            <div class="video-wrapper">
+                <video id="video-player"></video>
             </div>
-        </section>
-
-        <!-- قسم المعلمين حسب المادة -->
-        <section class="teachers-section" id="teachers-section">
-            <h2 class="section-title" id="subject-title">معلمو مادة الفيزياء</h2>
-            <button class="back-btn" id="back-to-subjects">
-                <i class="fas fa-arrow-left"></i> العودة إلى المواد الدراسية
-            </button>
-            <div class="teachers-grid" id="teachers-container">
-                <!-- سيتم ملء هذا القسم بالبيانات من ملف data.js -->
-            </div>
-        </section>
-
-        <!-- قسم الفصول الدراسية -->
-        <section class="classes-section" id="classes-section">
-            <h2 class="section-title" id="teacher-title">فصول الأستاذ أحمد النعيمي</h2>
-            <button class="back-btn" id="back-to-teachers">
-                <i class="fas fa-arrow-left"></i> العودة إلى المعلمين
-            </button>
-            <div class="classes-grid" id="classes-container">
-                <!-- سيتم ملء هذا القسم بالبيانات من ملف data.js -->
-            </div>
-        </section>
-
-        <!-- قسم المحاضرات -->
-        <section class="lectures-section" id="lectures-section">
-            <h2 class="section-title" id="class-title">المحاضرات - الفصل الأول: المتسعات</h2>
-            <button class="back-btn" id="back-to-classes">
-                <i class="fas fa-arrow-left"></i> العودة إلى الفصول
-            </button>
-            <div class="lectures-grid" id="lectures-container">
-                <!-- سيتم ملء هذا القسم بالبيانات من ملف data.js -->
-            </div>
-        </section>
-
-        <!-- قسم ميزات المنصة -->
-        <section class="features" id="features-section">
-            <h2 class="section-title">لماذا أيون أكاديمي؟</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <i class="fas fa-video"></i>
-                    <h3>محاضرات عالية الجودة</h3>
-                    <p>محاضرات مسجلة بدقة عالية مع شرح وافٍ للمفاهيم</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    <h3>معلمون متخصصون</h3>
-                    <p>فريق من أفضل المعلمين ذوي الخبرة في المجال التعليمي</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-sync-alt"></i>
-                    <h3>تحديث مستمر</h3>
-                    <p>إضافة محاضرات ومواد جديدة باستمرار لتواكب التطورات</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-headset"></i>
-                    <h3>دعم فني متكامل</h3>
-                    <p>فريق دعم فني متاح على مدار الساعة لمساعدتك</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- مشغل الفيديو -->
-<div class="video-modal" id="video-modal">
-    <div class="video-container">
-        <div class="video-header">
-            <div class="video-title" id="video-title">المحاضرة التعريفية</div>
-            <div class="video-meta">
-                <span id="video-progress">0% مكتمل</span>
-                <span id="video-duration">00:00</span>
-            </div>
-            <div class="close-video" id="close-video">
-                <i class="fas fa-times"></i>
-            </div>
-        </div>
-        <div class="video-player">
-            <video id="lecture-video" controls playsinline>
-                <!-- سيتم تعيين المصدر ديناميكيًا -->
-            </video>
-        </div>
-        <div class="video-controls">
-            <div class="control-group">
-                <button class="control-btn" id="play-pause-btn">
+            <div class="video-controls">
+                <button class="control-btn" id="play-pause">
                     <i class="fas fa-play"></i>
                 </button>
-                <button class="control-btn" id="rewind-btn">
-                    <i class="fas fa-backward"></i>
-                </button>
-                <button class="control-btn" id="forward-btn">
-                    <i class="fas fa-forward"></i>
-                </button>
-            </div>
-            
-            <div class="control-group">
-                <span class="control-label">السرعة:</span>
-                <select class="control-select" id="speed-select">
-                    <option value="0.5">0.5x</option>
-                    <option value="0.75">0.75x</option>
-                    <option value="1" selected>1x (عادية)</option>
-                    <option value="1.25">1.25x</option>
-                    <option value="1.5">1.5x</option>
-                    <option value="2">2x</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <span class="control-label">الجودة:</span>
-                <select class="control-select" id="quality-select">
-                    <option value="auto" selected>تلقائية</option>
-                    <option value="360">360p</option>
-                    <option value="480">480p</option>
-                    <option value="720">720p (HD)</option>
-                    <option value="1080">1080p (Full HD)</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
+                <div class="progress-container" id="video-progress-container">
+                    <div class="video-progress-bar" id="video-progress-bar"></div>
+                </div>
+                <div class="progress-time">
+                    <span id="current-time">0:00</span> / 
+                    <span id="total-time">0:00</span>
+                </div>
                 <button class="control-btn" id="volume-btn">
                     <i class="fas fa-volume-up"></i>
                 </button>
-                <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" class="control-select">
-            </div>
-            
-            <div class="control-group">
-                <button class="control-btn" id="fullscreen-btn">
+                <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1">
+                <button class="control-btn" id="fullscreen">
                     <i class="fas fa-expand"></i>
                 </button>
-                <button class="control-btn" id="close-btn">
-                    <i class="fas fa-times"></i> إغلاق
-                </button>
             </div>
-            
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
-                <div class="progress-time" id="progress-time">00:00</div>
+            <div class="proxy-status">
+                حالة الاتصال: <span class="proxy-server" id="proxy-status">جاري التهيئة...</span>
             </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 منصة الدروس - جميع الحقوق محفوظة | تم التطوير لحل مشكلة تغيير سيرفرات منصة أبواب</p>
         </div>
     </div>
-</div>
 
-    <!-- تذييل الصفحة -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <i class="fas fa-atom"></i>
-                    <h2>أيون أكاديمي</h2>
-                    <p>التميز التعليمي في متناول يديك</p>
-                </div>
-                <div class="footer-links">
-                    <div class="link-group">
-                        <h3>روابط سريعة</h3>
-                        <a href="#">الرئيسية</a>
-                        <a href="#">المحاضرات</a>
-                        <a href="#">المعلمين</a>
-                        <a href="#">الفصول</a>
-                    </div>
-                    <div class="link-group">
-                        <h3>المواد الدراسية</h3>
-                        <a href="#">الرياضيات</a>
-                        <a href="#">الفيزياء</a>
-                        <a href="#">الكيمياء</a>
-                        <a href="#">الأحياء</a>
-                    </div>
-                    <div class="link-group">
-                        <h3>تواصل معنا</h3>
-                        <a href="#">الدعم الفني</a>
-                        <a href="#">الأسئلة الشائعة</a>
-                        <a href="#">سياسة الخصوصية</a>
-                        <a href="#">الشروط والأحكام</a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2023 أيون أكاديمي. جميع الحقوق محفوظة.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- استدعاء مكتبات JavaScript -->
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
-    
-    <!-- استدعاء ملف البيانات -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="data.js"></script>
-    
-    <!-- الكود الرئيسي -->
-    <script src="app.js"></script>
+    <script>
+        // دالة مساعدة لتحويل الثواني إلى تنسيق دقائق:ثواني
+        function formatDuration(seconds) {
+            if (!seconds || isNaN(seconds)) return 'غير محدد';
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+
+        // دالة لعرض المعلمين وفصولهم
+        function renderTeachers() {
+            const container = document.getElementById('teachers-container');
+            container.innerHTML = '';
+            
+            teacherData2026.teachers.forEach(teacher => {
+                const teacherCard = document.createElement('div');
+                teacherCard.className = 'teacher-card';
+                
+                teacherCard.innerHTML = `
+                    <div class="teacher-header">
+                        <img src="${teacher.image}" alt="${teacher.name}" class="teacher-image" onerror="this.src='https://via.placeholder.com/100'">
+                        <div class="teacher-info">
+                            <h2 class="teacher-name">${teacher.name}</h2>
+                            <p class="teacher-subject">${teacher.subject}</p>
+                        </div>
+                    </div>
+                    <div class="classes-container" id="classes-${teacher.id}"></div>
+                `;
+                
+                container.appendChild(teacherCard);
+                
+                const classesContainer = teacherCard.querySelector(`#classes-${teacher.id}`);
+                
+                teacher.classes.forEach((classItem, classIndex) => {
+                    const classDiv = document.createElement('div');
+                    classDiv.className = 'class-section';
+                    classDiv.innerHTML = `
+                        <h3 class="class-title">${classItem.name}</h3>
+                        <div class="lectures-grid" id="lectures-${teacher.id}-${classIndex}"></div>
+                    `;
+                    
+                    classesContainer.appendChild(classDiv);
+                    
+                    const lecturesGrid = classDiv.querySelector(`#lectures-${teacher.id}-${classIndex}`);
+                    renderLectures(teacher, classItem, lecturesGrid);
+                });
+            });
+        }
+
+        // دالة لعرض المحاضرات
+        function renderLectures(teacher, classItem, container) {
+            classItem.lectures.forEach(lecture => {
+                // توليد مفتاح فريد
+                const uniqueKey = btoa(lecture.url).replace(/[^a-z0-9]/gi, '');
+                const storageKey = `${uniqueKey}-progress`;
+                const savedProgress = localStorage.getItem(storageKey) || 0;
+                
+                // تنسيق المدة
+                const durationFormatted = formatDuration(lecture.duration);
+                
+                // حالة المحاضرة (تم مشاهدتها جزئياً أو كاملة)
+                let statusText = 'لم تبدأ بعد';
+                let statusIcon = 'far fa-circle';
+                let statusColor = '#f44336';
+                
+                if (savedProgress > 0 && savedProgress < 95) {
+                    statusText = 'قيد الإكمال';
+                    statusIcon = 'fas fa-pause-circle';
+                    statusColor = '#ff9800';
+                } else if (savedProgress >= 95) {
+                    statusText = 'مكتملة';
+                    statusIcon = 'fas fa-check-circle';
+                    statusColor = '#4caf50';
+                }
+                
+                const progressBarHTML = savedProgress > 0 ? `
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${savedProgress}%"></div>
+                        </div>
+                        <div class="progress-text">${parseFloat(savedProgress).toFixed(1)}% مكتمل</div>
+                    </div>
+                ` : '';
+                
+                const lectureCard = document.createElement('div');
+                lectureCard.className = 'lecture-card';
+                lectureCard.innerHTML = `
+                    <div class="lecture-thumb">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="lecture-content">
+                        <h3 class="lecture-title">${lecture.title}</h3>
+                        <p>${lecture.description}</p>
+                        <div class="lecture-meta">
+                            <div class="lecture-duration">
+                                <i class="fas fa-clock"></i>
+                                <span>${durationFormatted}</span>
+                            </div>
+                            <div class="lecture-status" style="color: ${statusColor}">
+                                <i class="${statusIcon}"></i>
+                                <span>${statusText}</span>
+                            </div>
+                        </div>
+                        <button class="watch-btn" data-url="${lecture.url}" data-title="${lecture.title}" data-key="${uniqueKey}">
+                            <i class="fas fa-play"></i> مشاهدة المحاضرة
+                        </button>
+                        ${progressBarHTML}
+                    </div>
+                `;
+                
+                container.appendChild(lectureCard);
+                
+                // إضافة مستمع الحدث للزر
+                lectureCard.querySelector('.watch-btn').addEventListener('click', function() {
+                    const url = this.getAttribute('data-url');
+                    const title = this.getAttribute('data-title');
+                    const key = this.getAttribute('data-key');
+                    playLecture(url, title, key);
+                });
+            });
+        }
+
+        // دالة لاختبار اتصال مباشر
+        function testDirectConnection(url) {
+            return new Promise((resolve, reject) => {
+                const testVideo = document.createElement('video');
+                testVideo.src = url;
+                
+                const onError = () => {
+                    testVideo.removeEventListener('error', onError);
+                    testVideo.removeEventListener('canplay', onCanPlay);
+                    reject(new Error('Direct connection failed'));
+                };
+                
+                const onCanPlay = () => {
+                    testVideo.removeEventListener('error', onError);
+                    testVideo.removeEventListener('canplay', onCanPlay);
+                    resolve();
+                };
+                
+                testVideo.addEventListener('error', onError);
+                testVideo.addEventListener('canplay', onCanPlay);
+                
+                // مهلة 5 ثواني
+                setTimeout(() => {
+                    testVideo.removeEventListener('error', onError);
+                    testVideo.removeEventListener('canplay', onCanPlay);
+                    reject(new Error('Timeout'));
+                }, 5000);
+            });
+        }
+
+        // دالة لتشغيل المحاضرة
+        async function playLecture(url, title, uniqueKey) {
+            const videoPlayer = document.getElementById('video-player');
+            const videoTitle = document.getElementById('video-title');
+            const videoContainer = document.querySelector('.video-container');
+            const proxyStatus = document.getElementById('proxy-status');
+            const storageKey = `${uniqueKey}-progress`;
+            
+            videoTitle.textContent = title;
+            videoContainer.style.display = 'block';
+            proxyStatus.textContent = "جاري الاتصال بالسيرفر...";
+            proxyStatus.style.color = "#2196F3";
+            
+            // إيقاف أي تشغيل سابق
+            if (videoPlayer.hls) {
+                videoPlayer.hls.destroy();
+            }
+            videoPlayer.pause();
+            videoPlayer.src = '';
+            
+            // 1. محاولة الاتصال المباشر
+            try {
+                await testDirectConnection(url);
+                proxyStatus.textContent = "متصل مباشرة";
+                setupVideoPlayer(url, storageKey);
+                return;
+            } catch (error) {
+                console.log("فشل الاتصال المباشر: ", error.message);
+            }
+            
+            // 2. استخدام بروكسي Cloudflare
+            try {
+                const proxyUrl1 = `https://abwaab-proxy.ss9758026.workers.dev/?url=${encodeURIComponent(url)}`;
+                await testDirectConnection(proxyUrl1);
+                proxyStatus.textContent = "متصل عبر Cloudflare Proxy";
+                setupVideoPlayer(proxyUrl1, storageKey);
+                return;
+            } catch (error) {
+                console.log("فشل بروكسي Cloudflare: ", error.message);
+            }
+            
+            // 3. استخدام بروكسي CORS Anywhere
+            try {
+                const proxyUrl2 = `https://cors-anywhere.herokuapp.com/${url}`;
+                await testDirectConnection(proxyUrl2);
+                proxyStatus.textContent = "متصل عبر CORS Anywhere";
+                setupVideoPlayer(proxyUrl2, storageKey);
+                return;
+            } catch (error) {
+                console.log("فشل بروكسي CORS Anywhere: ", error.message);
+            }
+            
+            // 4. استخدام بروكسي CORS Bypass
+            try {
+                const proxyUrl3 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                await testDirectConnection(proxyUrl3);
+                proxyStatus.textContent = "متصل عبر CORS Bypass";
+                setupVideoPlayer(proxyUrl3, storageKey);
+                return;
+            } catch (error) {
+                console.log("فشل بروكسي CORS Bypass: ", error.message);
+            }
+            
+            // فشلت جميع المحاولات
+            proxyStatus.textContent = "فشل الاتصال - حاول لاحقاً";
+            proxyStatus.style.color = "#f44336";
+            
+            // عرض خيارات بديلة
+            showAlternativeOptions(url, title);
+        }
+
+        function showAlternativeOptions(url, title) {
+            const videoWrapper = document.querySelector('.video-wrapper');
+            videoWrapper.innerHTML = `
+                <div class="alt-options">
+                    <h3>لا يمكن تشغيل المحاضرة مباشرة</h3>
+                    <p>يمكنك تجربة أحد الخيارات التالية:</p>
+                    <div class="alt-buttons">
+                        <button class="alt-btn" onclick="window.open('${url}', '_blank')">
+                            <i class="fas fa-external-link-alt"></i> فتح في نافذة جديدة
+                        </button>
+                        <button class="alt-btn" onclick="downloadLecture('${url}', '${title}')">
+                            <i class="fas fa-download"></i> تنزيل المحاضرة
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadLecture(url, title) {
+            // هذه دالة مساعدة للتنزيل (قد تحتاج لتنفيذ مختلف حسب السيرفر)
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${title}.mp4`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // دالة إعداد مشغل الفيديو
+        function setupVideoPlayer(url, storageKey) {
+            const videoPlayer = document.getElementById('video-player');
+            const currentTimeEl = document.getElementById('current-time');
+            const totalTimeEl = document.getElementById('total-time');
+            
+            // إعادة تعيين عناصر الوقت
+            currentTimeEl.textContent = '0:00';
+            totalTimeEl.textContent = '0:00';
+            
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    debug: false,
+                    xhrSetup: function(xhr) {
+                        xhr.setRequestHeader('Referer', 'https://abwaab.com/');
+                        xhr.setRequestHeader('Origin', 'https://abwaab.com');
+                    }
+                });
+                
+                hls.loadSource(url);
+                hls.attachMedia(videoPlayer);
+                videoPlayer.hls = hls;
+                
+                // استعادة التقدم المحفوظ
+                const savedProgress = localStorage.getItem(storageKey);
+                if (savedProgress) {
+                    videoPlayer.addEventListener('loadedmetadata', function() {
+                        if (videoPlayer.duration && savedProgress > 0) {
+                            videoPlayer.currentTime = (savedProgress / 100) * videoPlayer.duration;
+                        }
+                    });
+                }
+                
+                // حفظ التقدم أثناء التشغيل
+                videoPlayer.addEventListener('timeupdate', function() {
+                    if (videoPlayer.duration) {
+                        const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+                        localStorage.setItem(storageKey, percent);
+                        
+                        // تحديث الوقت الحالي
+                        currentTimeEl.textContent = formatDuration(videoPlayer.currentTime);
+                    }
+                });
+                
+                // تحديث الوقت الكلي عند توفر البيانات
+                videoPlayer.addEventListener('loadedmetadata', function() {
+                    if (videoPlayer.duration) {
+                        totalTimeEl.textContent = formatDuration(videoPlayer.duration);
+                    }
+                });
+                
+                // معالجة الأخطاء
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        switch(data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                console.error("خطأ في الشبكة - حاول إعادة التحميل");
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.error("خطأ في الوسائط - حاول إعادة التحميل");
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                hls.destroy();
+                                break;
+                        }
+                    }
+                });
+                
+            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari
+                videoPlayer.src = url;
+                
+                // استعادة التقدم
+                const savedProgress = localStorage.getItem(storageKey);
+                if (savedProgress) {
+                    videoPlayer.addEventListener('loadedmetadata', function() {
+                        if (videoPlayer.duration && savedProgress > 0) {
+                            videoPlayer.currentTime = (savedProgress / 100) * videoPlayer.duration;
+                        }
+                    });
+                }
+                
+                // حفظ التقدم
+                videoPlayer.addEventListener('timeupdate', function() {
+                    if (videoPlayer.duration) {
+                        const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+                        localStorage.setItem(storageKey, percent);
+                        currentTimeEl.textContent = formatDuration(videoPlayer.currentTime);
+                    }
+                });
+                
+                videoPlayer.addEventListener('loadedmetadata', function() {
+                    if (videoPlayer.duration) {
+                        totalTimeEl.textContent = formatDuration(videoPlayer.duration);
+                    }
+                });
+            }
+            
+            // إعداد عناصر التحكم
+            setupVideoControls();
+            
+            // محاولة التشغيل التلقائي
+            const playPromise = videoPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log('التشغيل التلقائي فشل:', error);
+                });
+            }
+        }
+
+        // إعداد عناصر التحكم بالفيديو
+        function setupVideoControls() {
+            const video = document.getElementById('video-player');
+            const playPauseBtn = document.getElementById('play-pause');
+            const volumeBtn = document.getElementById('volume-btn');
+            const volumeSlider = document.getElementById('volume-slider');
+            const fullscreenBtn = document.getElementById('fullscreen');
+            const progressContainer = document.getElementById('video-progress-container');
+            const progressBar = document.getElementById('video-progress-bar');
+            const closeBtn = document.getElementById('close-video');
+            
+            // تشغيل/إيقاف
+            playPauseBtn.addEventListener('click', function() {
+                if (video.paused) {
+                    video.play();
+                    this.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    video.pause();
+                    this.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+            
+            // تحديث زر التشغيل عند تغيير الحالة
+            video.addEventListener('play', function() {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            });
+            
+            video.addEventListener('pause', function() {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+            
+            // التحكم في الصوت
+            volumeSlider.addEventListener('input', function() {
+                video.volume = this.value;
+                if (this.value == 0) {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else if (this.value < 0.5) {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
+                } else {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
+            
+            // كتم الصوت/إعادته
+            volumeBtn.addEventListener('click', function() {
+                if (video.volume > 0) {
+                    video.volume = 0;
+                    volumeSlider.value = 0;
+                    this.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    video.volume = 1;
+                    volumeSlider.value = 1;
+                    this.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
+            
+            // شاشة كاملة
+            fullscreenBtn.addEventListener('click', function() {
+                const videoContainer = document.querySelector('.video-container');
+                if (!document.fullscreenElement) {
+                    if (videoContainer.requestFullscreen) {
+                        videoContainer.requestFullscreen();
+                    } else if (videoContainer.mozRequestFullScreen) {
+                        videoContainer.mozRequestFullScreen();
+                    } else if (videoContainer.webkitRequestFullscreen) {
+                        videoContainer.webkitRequestFullscreen();
+                    } else if (videoContainer.msRequestFullscreen) {
+                        videoContainer.msRequestFullscreen();
+                    }
+                    this.innerHTML = '<i class="fas fa-compress"></i>';
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                    this.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            });
+            
+            // شريط التقدم
+            progressContainer.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / this.offsetWidth;
+                video.currentTime = pos * video.duration;
+            });
+            
+            video.addEventListener('timeupdate', function() {
+                if (video.duration) {
+                    const percent = (video.currentTime / video.duration) * 100;
+                    progressBar.style.width = `${percent}%`;
+                }
+            });
+            
+            // إغلاق الفيديو
+            closeBtn.addEventListener('click', function() {
+                document.querySelector('.video-container').style.display = 'none';
+                video.pause();
+                if (video.hls) {
+                    video.hls.destroy();
+                }
+                renderTeachers(); // إعادة تحميل واجهة المستخدم لتحديث التقدم
+            });
+        }
+
+        // تهيئة الصفحة عند التحميل
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTeachers();
+            
+            // تهيئة منزلق الصوت
+            const volumeSlider = document.getElementById('volume-slider');
+            volumeSlider.style.width = '80px';
+            volumeSlider.style.display = 'none';
+            
+            document.getElementById('volume-btn').addEventListener('click', function() {
+                volumeSlider.style.display = volumeSlider.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            // إخفاء الفيديو في البداية
+            document.querySelector('.video-container').style.display = 'none';
+        });
+    </script>
 </body>
 </html>
