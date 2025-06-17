@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // متغيرات عالمية
-let hls = null;
-const PROXY_URL = "https://abwaab-proxy.ss9758026.workers.dev"; // رابط Cloudflare Worker الخاص بك
+const PROXY_URL = "https://ion-academy-proxy.workers.dev"; // استبدل برابط البروكسي الخاص بك
+let currentHls = null;
 
 // إعداد مستمعي الأحداث
 function setupEventListeners() {
@@ -38,9 +38,6 @@ function setupEventListeners() {
     document.getElementById('close-video').addEventListener('click', function() {
         closeVideoPlayer();
     });
-    
-    // التحكم في مشغل الفيديو
-    setupVideoControls();
     
     // البحث
     document.getElementById('search-btn').addEventListener('click', searchContent);
@@ -342,221 +339,155 @@ function showLecturesByClass(teacher, classItem, classIndex) {
 // تشغيل المحاضرة باستخدام البروكسي
 function playLecture(url, title) {
     const videoModal = document.getElementById('video-modal');
-    const videoPlayer = document.getElementById('lecture-video');
+    const videoPlayerContainer = document.getElementById('video-player');
     const videoTitle = document.getElementById('video-title');
     
-    // تحديث عنوان المحاضرة
     videoTitle.textContent = title;
-    
-    // إظهار مشغل الفيديو
     videoModal.classList.add('active');
     
-    // تدمير مشغل HLS السابق إذا كان موجودًا
-    if (hls) {
-        hls.destroy();
-        hls = null;
+    // تدمير مشغل HLS السابق
+    if (currentHls) {
+        currentHls.destroy();
+        currentHls = null;
     }
     
-    // إنشاء رابط البروكسي
+    // مسح المحتوى السابق
+    videoPlayerContainer.innerHTML = '';
+    
+    // إنشاء عناصر مشغل الفيديو الجديد
+    const videoElement = document.createElement('video');
+    videoElement.id = 'player';
+    videoElement.playsinline = true;
+    
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'video-loading';
+    loadingIndicator.textContent = 'جاري التحميل...';
+    
+    videoPlayerContainer.appendChild(videoElement);
+    videoPlayerContainer.appendChild(loadingIndicator);
+    
+    // إعداد مشغل الفيديو
     const proxyUrl = `${PROXY_URL}?url=${encodeURIComponent(url)}`;
     
-    // تهيئة مشغل HLS الجديد
+    // إنشاء مشغل HLS
     if (Hls.isSupported()) {
-        hls = new Hls({
+        currentHls = new Hls({
             debug: false,
-            xhrSetup: function(xhr) {
-                xhr.setRequestHeader('Cache-Control', 'no-cache');
-                xhr.setRequestHeader('Pragma', 'no-cache');
-            }
+            enableWorker: true,
+            backBufferLength: 90,
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+            maxBufferSize: 60 * 1000 * 1000,
+            manifestLoadingMaxRetry: 5,
+            levelLoadingMaxRetry: 5,
+            fragLoadingMaxRetry: 5,
         });
         
-        hls.loadSource(proxyUrl);
-        hls.attachMedia(videoPlayer);
+        currentHls.loadSource(proxyUrl);
+        currentHls.attachMedia(videoElement);
         
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-            videoPlayer.play().catch(e => {
-                console.error('خطأ في التشغيل التلقائي:', e);
+        currentHls.on(Hls.Events.MANIFEST_PARSED, function() {
+            // تهيئة Plyr بعد تحميل الفيديو
+            const player = new Plyr(videoElement, {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+                settings: ['quality', 'speed'],
+                speed: {
+                    selected: 1,
+                    options: [0.5, 0.75, 1, 1.25, 1.5, 2]
+                },
+                quality: {
+                    default: 0,
+                    options: getQualityOptions(currentHls.levels),
+                    forced: true,
+                    onChange: (quality) => updateQuality(quality, currentHls)
+                },
+                i18n: {
+                    qualityLabel: {
+                        0: 'تلقائي'
+                    }
+                }
+            });
+            
+            // إخفاء رسالة التحميل
+            loadingIndicator.style.display = 'none';
+            
+            // محاولة التشغيل التلقائي
+            player.play().catch(e => {
+                console.log('التشغيل التلقائي فشل:', e);
             });
         });
         
-        hls.on(Hls.Events.ERROR, function(event, data) {
-            console.error('HLS Error:', data);
+        currentHls.on(Hls.Events.ERROR, function(event, data) {
+            console.error('HLS error:', data);
             if (data.fatal) {
                 switch (data.type) {
                     case Hls.ErrorTypes.NETWORK_ERROR:
-                        hls.startLoad();
+                        console.error('Network error, trying to recover');
+                        currentHls.startLoad();
                         break;
                     case Hls.ErrorTypes.MEDIA_ERROR:
-                        hls.recoverMediaError();
+                        console.error('Media error, trying to recover');
+                        currentHls.recoverMediaError();
                         break;
                     default:
-                        closeVideoPlayer();
+                        console.error('Fatal error, cannot recover');
+                        showVideoError('تعذر تحميل الفيديو. يرجى المحاولة لاحقاً');
                         break;
                 }
             }
         });
-    } 
-    // دعم المتصفحات التي تدعم HLS بشكل أصلي (مثل Safari)
-    else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-        videoPlayer.src = proxyUrl;
-        videoPlayer.addEventListener('loadedmetadata', function() {
-            videoPlayer.play().catch(e => {
-                console.error('خطأ في التشغيل التلقائي:', e);
-            });
+    } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+        // دعم Safari الأصلي
+        videoElement.src = proxyUrl;
+        videoElement.addEventListener('loadedmetadata', function() {
+            const player = new Plyr(videoElement);
+            loadingIndicator.style.display = 'none';
+            player.play().catch(console.error);
         });
     } else {
-        alert('عذرًا، متصفحك لا يدعم تشغيل هذا النوع من الفيديوهات.');
+        showVideoError('عذرًا، متصفحك لا يدعم تشغيل هذا النوع من الفيديوهات');
     }
+}
+
+// الحصول على خيارات الجودة
+function getQualityOptions(levels) {
+    if (!levels || levels.length === 0) return [0];
     
-    // تحديث عناصر التحكم
-    setupVideoControls();
+    const options = [0]; // تلقائي
+    levels.forEach(level => {
+        if (level.height && !options.includes(level.height)) {
+            options.push(level.height);
+        }
+    });
+    
+    return options.sort((a, b) => b - a); // تنازلي
+}
+
+// تحديث الجودة
+function updateQuality(quality, hls) {
+    if (quality === 0) {
+        hls.currentLevel = -1; // الجودة التلقائية
+    } else {
+        const level = hls.levels.findIndex(l => l.height === quality);
+        if (level !== -1) hls.currentLevel = level;
+    }
 }
 
 // إغلاق مشغل الفيديو
 function closeVideoPlayer() {
     const videoModal = document.getElementById('video-modal');
-    const videoPlayer = document.getElementById('lecture-video');
+    const videoPlayerContainer = document.getElementById('video-player');
     
-    videoPlayer.pause();
     videoModal.classList.remove('active');
     
     // تدمير مشغل HLS عند الإغلاق
-    if (hls) {
-        hls.destroy();
-        hls = null;
+    if (currentHls) {
+        currentHls.destroy();
+        currentHls = null;
     }
-}
-
-// إعداد عناصر التحكم بالفيديو
-function setupVideoControls() {
-    const video = document.getElementById('lecture-video');
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    const rewindBtn = document.getElementById('rewind-btn');
-    const forwardBtn = document.getElementById('forward-btn');
-    const speedSelect = document.getElementById('speed-select');
-    const volumeBtn = document.getElementById('volume-btn');
-    const volumeSlider = document.getElementById('volume-slider');
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const closeBtn = document.getElementById('close-btn');
-    const progressBar = document.getElementById('progress-bar');
-    const progressContainer = document.querySelector('.progress-container');
-    const progressTime = document.getElementById('progress-time');
     
-    // زر التشغيل/الإيقاف المؤقت
-    playPauseBtn.addEventListener('click', function() {
-        if (video.paused) {
-            video.play();
-            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        } else {
-            video.pause();
-            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-        }
-    });
-    
-    // تحديث أيقونة التشغيل/الإيقاف
-    video.addEventListener('play', function() {
-        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    });
-    
-    video.addEventListener('pause', function() {
-        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    });
-    
-    // الترجيع 10 ثواني
-    rewindBtn.addEventListener('click', function() {
-        video.currentTime -= 10;
-    });
-    
-    // التقديم 10 ثواني
-    forwardBtn.addEventListener('click', function() {
-        video.currentTime += 10;
-    });
-    
-    // تغيير سرعة التشغيل
-    speedSelect.addEventListener('change', function() {
-        video.playbackRate = parseFloat(this.value);
-    });
-    
-    // التحكم في مستوى الصوت
-    volumeSlider.addEventListener('input', function() {
-        video.volume = this.value;
-        if (this.value > 0) {
-            volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-        } else {
-            volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        }
-    });
-    
-    // كتم الصوت
-    volumeBtn.addEventListener('click', function() {
-        if (video.volume > 0) {
-            video.volume = 0;
-            volumeSlider.value = 0;
-            volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        } else {
-            video.volume = 1;
-            volumeSlider.value = 1;
-            volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-        }
-    });
-    
-    // وضع ملء الشاشة
-    fullscreenBtn.addEventListener('click', function() {
-        const videoContainer = document.querySelector('.video-container');
-        if (!document.fullscreenElement) {
-            if (videoContainer.requestFullscreen) {
-                videoContainer.requestFullscreen();
-            } else if (videoContainer.mozRequestFullScreen) {
-                videoContainer.mozRequestFullScreen();
-            } else if (videoContainer.webkitRequestFullscreen) {
-                videoContainer.webkitRequestFullscreen();
-            } else if (videoContainer.msRequestFullscreen) {
-                videoContainer.msRequestFullscreen();
-            }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        }
-    });
-    
-    // زر إغلاق الفيديو
-    closeBtn.addEventListener('click', function() {
-        closeVideoPlayer();
-    });
-    
-    // شريط التقدم
-    video.addEventListener('timeupdate', function() {
-        const percent = (video.currentTime / video.duration) * 100;
-        progressBar.style.width = `${percent}%`;
-    });
-    
-    // النقر على شريط التقدم
-    progressContainer.addEventListener('click', function(e) {
-        const rect = this.getBoundingClientRect();
-        const pos = (e.clientX - rect.left) / rect.width;
-        video.currentTime = pos * video.duration;
-    });
-    
-    // عرض وقت التقدم عند تحريك الماوس
-    progressContainer.addEventListener('mousemove', function(e) {
-        const rect = this.getBoundingClientRect();
-        const pos = (e.clientX - rect.left) / rect.width;
-        const time = pos * video.duration;
-        
-        // تحويل الوقت إلى دقائق وثواني
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        
-        progressTime.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        progressTime.style.left = `${e.clientX - rect.left}px`;
-    });
+    // مسح محتوى مشغل الفيديو
+    videoPlayerContainer.innerHTML = '';
 }
 
 // وظيفة البحث
@@ -723,4 +654,13 @@ function displaySearchResults(results) {
 function toggleMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
     navLinks.classList.toggle('active');
+}
+
+// عرض خطأ في مشغل الفيديو
+function showVideoError(message) {
+    const videoPlayerContainer = document.getElementById('video-player');
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'error-message';
+    errorMessage.textContent = message;
+    videoPlayerContainer.appendChild(errorMessage);
 }
