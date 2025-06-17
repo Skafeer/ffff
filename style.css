@@ -595,3 +595,47 @@ footer {
     margin: 10px 0;
     text-align: center;
 }
+/* إضافة في نهاية الملف */
+
+.lecture-progress {
+    height: 5px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.lecture-progress .progress-bar {
+    height: 100%;
+    background: var(--primary);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.video-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #2c3e50;
+    color: white;
+    flex-wrap: wrap;
+}
+
+.video-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.video-container {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.video-container:hover {
+    transform: scale(1.02);
+}
