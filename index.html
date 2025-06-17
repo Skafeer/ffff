@@ -5,10 +5,458 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>أيون أكاديمي - المنصة التعليمية المتكاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
     <style>
         /* أنماط إضافية لتحسين تجربة المستخدم */
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --text: #2c3e50;
+            --background: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: var(--secondary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* البانر الرئيسي */
+        .hero {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero-content h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        .search-box {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat h3 {
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+
+        /* أقسام المحتوى */
+        .section-title {
+            text-align: center;
+            margin: 50px 0 30px;
+            font-size: 28px;
+            color: var(--secondary);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .subject-grid, .teachers-grid, .classes-grid, .lectures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        /* البطاقات */
+        .subject-card, .teacher-card, .class-card, .feature-card, .lecture-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .subject-card {
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .subject-card i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .subject-card h3 {
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .subject-card p {
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        .teachers-count {
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .teacher-card {
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .teacher-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .teacher-avatar img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .teacher-info h3 {
+            margin-bottom: 5px;
+        }
+
+        .teacher-info p {
+            color: #777;
+        }
+
+        .class-card {
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .class-card i {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .class-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .lectures-count {
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .feature-card {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .feature-card i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .lecture-card {
+            display: flex;
+            padding: 15px;
+            gap: 15px;
+        }
+
+        .lecture-thumb {
+            flex: 0 0 100px;
+            background: var(--light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lecture-thumb i {
+            font-size: 36px;
+            color: var(--primary);
+        }
+
+        .lecture-content {
+            flex: 1;
+        }
+
+        .lecture-title {
+            margin-bottom: 10px;
+        }
+
+        .lecture-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            color: #777;
+        }
+
+        .lecture-duration {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .watch-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* أزرار العودة */
+        .back-btn {
+            background: var(--light);
+            color: var(--dark);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn i {
+            margin-right: 5px;
+        }
+
+        /* تذييل الصفحة */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-logo i {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo h2 {
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            flex: 2;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .link-group {
+            min-width: 200px;
+        }
+
+        .link-group h3 {
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .link-group h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .link-group a {
+            display: block;
+            color: #ddd;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .link-group a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        /* مشغل الفيديو */
         .video-modal {
             position: fixed;
             top: 0;
@@ -21,11 +469,11 @@
             align-items: center;
             z-index: 1000;
         }
-        
+
         .video-modal.active {
             display: flex;
         }
-        
+
         .video-container {
             width: 90%;
             max-width: 900px;
@@ -34,7 +482,7 @@
             overflow: hidden;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
-        
+
         .video-header {
             display: flex;
             justify-content: space-between;
@@ -43,33 +491,35 @@
             background: #2c3e50;
             color: white;
         }
-        
+
         .close-video {
             cursor: pointer;
             font-size: 24px;
         }
-        
+
         .video-player {
+            position: relative;
             width: 100%;
             background: #000;
+            min-height: 300px;
         }
-        
+
         .video-player video {
             width: 100%;
             display: block;
         }
-        
+
         .video-controls {
             padding: 15px;
             background: #f5f5f5;
         }
-        
+
         .control-group {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
-        
+
         .control-btn {
             background: #3498db;
             color: white;
@@ -79,14 +529,14 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        
+
         .control-select {
             padding: 5px;
             border-radius: 5px;
             border: 1px solid #ddd;
             margin-left: 10px;
         }
-        
+
         .progress-container {
             height: 5px;
             background: #ddd;
@@ -94,13 +544,13 @@
             position: relative;
             cursor: pointer;
         }
-        
+
         .progress-bar {
             height: 100%;
             background: #3498db;
             width: 0%;
         }
-        
+
         .progress-time {
             position: absolute;
             top: -25px;
@@ -110,37 +560,29 @@
             border-radius: 3px;
             display: none;
         }
-        
+
         .progress-container:hover .progress-time {
             display: block;
         }
-        
-        /* تحسينات للواجهة العربية */
-        .subject-card, .teacher-card, .class-card, .lecture-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        /* نتائج البحث */
+        .no-results {
+            text-align: center;
+            padding: 50px 0;
+            color: #777;
         }
-        
-        .subject-card:hover, .teacher-card:hover, .class-card:hover, .lecture-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .watch-btn {
-            background: #3498db;
+
+        /* رسالة التحميل */
+        .video-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            font-size: 20px;
+            z-index: 10;
         }
-        
-        .watch-btn:hover {
-            background: #2980b9;
-        }
-        
+
         /* تحسينات للقائمة المتنقلة */
         .mobile-menu {
             display: none;
@@ -167,6 +609,16 @@
             .nav-links.active {
                 display: flex;
             }
+        }
+        
+        /* تحسينات للمواد الدراسية */
+        .subject-card:hover, .teacher-card:hover, .class-card:hover, .lecture-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .watch-btn:hover {
+            background: #2980b9;
         }
     </style>
 </head>
@@ -298,7 +750,8 @@
                     <i class="fas fa-times"></i>
                 </div>
             </div>
-            <div class="video-player">
+            <div class="video-player" id="video-player">
+                <div class="video-loading">جاري التحميل...</div>
                 <video id="lecture-video" controls playsinline>
                     <!-- سيتم تعيين المصدر ديناميكيًا -->
                 </video>
@@ -332,10 +785,7 @@
                     <span class="control-label">الجودة:</span>
                     <select class="control-select" id="quality-select">
                         <option value="auto" selected>تلقائية</option>
-                        <option value="360">360p</option>
-                        <option value="480">480p</option>
-                        <option value="720">720p (HD)</option>
-                        <option value="1080">1080p (Full HD)</option>
+                        <!-- سيتم ملء هذا القسم ديناميكيًا -->
                     </select>
                 </div>
                 
@@ -408,13 +858,856 @@
         </div>
     </footer>
 
-    <!-- استدعاء ملف البيانات -->
-    <script src="data.js"></script>
-    
-    <!-- استدعاء مكتبة HLS.js -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.3/dist/hls.min.js"></script>
-    
     <!-- الكود الرئيسي -->
-    <script src="app.js"></script>
+    <script>
+        // app.js
+        document.addEventListener('DOMContentLoaded', function() {
+            // تأكد من وجود بيانات المعلمين
+            if (typeof teacherData2026 !== 'undefined' && teacherData2026.teachers) {
+                setupEventListeners();
+                renderSubjects();
+            }
+            
+            // إضافة حدث القائمة المتنقلة
+            const mobileMenu = document.querySelector('.mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', toggleMobileMenu);
+            }
+        });
+
+        // متغيرات عالمية
+        let hls = null;
+        const PROXY_URL = "https://ion-academy-proxy.workers.dev"; // رابط Cloudflare Worker الخاص بأيون أكاديمي
+
+        // إعداد مستمعي الأحداث
+        function setupEventListeners() {
+            // العودة إلى المواد الدراسية
+            document.getElementById('back-to-subjects').addEventListener('click', function() {
+                showSection('subjects-section');
+            });
+            
+            // العودة إلى المعلمين
+            document.getElementById('back-to-teachers').addEventListener('click', function() {
+                showSection('teachers-section');
+            });
+            
+            // العودة إلى الفصول
+            document.getElementById('back-to-classes').addEventListener('click', function() {
+                showSection('classes-section');
+            });
+            
+            // إغلاق مشغل الفيديو
+            document.getElementById('close-video').addEventListener('click', function() {
+                closeVideoPlayer();
+            });
+            
+            // التحكم في مشغل الفيديو
+            setupVideoControls();
+            
+            // البحث
+            document.getElementById('search-btn').addEventListener('click', searchContent);
+            document.getElementById('search-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchContent();
+                }
+            });
+            
+            // التنقل
+            document.getElementById('nav-teachers').addEventListener('click', function(e) {
+                e.preventDefault();
+                renderTeachers();
+                showSection('teachers-section');
+            });
+            
+            document.getElementById('nav-classes').addEventListener('click', function(e) {
+                e.preventDefault();
+                renderClasses();
+                showSection('classes-section');
+            });
+        }
+
+        // إظهار قسم معين وإخفاء الأقسام الأخرى
+        function showSection(sectionId) {
+            const sections = [
+                'subjects-section', 
+                'teachers-section', 
+                'classes-section', 
+                'lectures-section',
+                'features-section'
+            ];
+            
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = id === sectionId ? 'block' : 'none';
+                }
+            });
+        }
+
+        // عرض المواد الدراسية
+        function renderSubjects() {
+            const subjectsContainer = document.getElementById('subjects-container');
+            subjectsContainer.innerHTML = '';
+            
+            // تعريف المواد الدراسية
+            const subjects = [
+                { 
+                    name: "الرياضيات", 
+                    icon: "fas fa-calculator",
+                    teachers: teacherData2026.teachers.filter(t => t.subject.includes('الرياضيات'))
+                },
+                { 
+                    name: "الفيزياء", 
+                    icon: "fas fa-atom",
+                    teachers: teacherData2026.teachers.filter(t => t.subject.includes('الفيزياء'))
+                },
+                { 
+                    name: "الكيمياء", 
+                    icon: "fas fa-flask",
+                    teachers: teacherData2026.teachers.filter(t => t.subject.includes('الكيمياء'))
+                },
+                { 
+                    name: "الأحياء", 
+                    icon: "fas fa-dna",
+                    teachers: teacherData2026.teachers.filter(t => t.subject.includes('الأحياء'))
+                },
+                { 
+                    name: "اللغة العربية", 
+                    icon: "fas fa-book",
+                    teachers: teacherData2026.teachers.filter(t => t.subject.includes('اللغة العربية'))
+                },
+                { 
+                    name: "اللغة الانكليزية", 
+                    icon: "fas fa-language",
+                    teachers: teacherData2026.teachers.filter(t => t.subject.includes('اللغة الانكليزية'))
+                }
+            ];
+            
+            // عرض المواد الدراسية
+            subjects.forEach(subject => {
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'subject-card';
+                subjectCard.innerHTML = `
+                    <i class="${subject.icon}"></i>
+                    <h3>${subject.name}</h3>
+                    <p>${subject.teachers.length} مدرس متخصص</p>
+                    <div class="teachers-count">${subject.teachers.length} مدرس</div>
+                `;
+                
+                // حدث النقر على المادة الدراسية
+                subjectCard.addEventListener('click', function() {
+                    showTeachersBySubject(subject.name, subject.teachers);
+                });
+                
+                subjectsContainer.appendChild(subjectCard);
+            });
+        }
+
+        // عرض جميع المعلمين
+        function renderTeachers() {
+            const teachersContainer = document.getElementById('teachers-container');
+            const subjectTitle = document.getElementById('subject-title');
+            
+            // تحديث العنوان
+            subjectTitle.textContent = `جميع المعلمين`;
+            
+            // إظهار قسم المعلمين وإخفاء الأقسام الأخرى
+            showSection('teachers-section');
+            
+            // مسح المحتوى السابق
+            teachersContainer.innerHTML = '';
+            
+            // عرض المعلمين
+            teacherData2026.teachers.forEach(teacher => {
+                const teacherCard = document.createElement('div');
+                teacherCard.className = 'teacher-card';
+                
+                teacherCard.innerHTML = `
+                    <div class="teacher-header">
+                        <div class="teacher-avatar">
+                            <img src="${teacher.image}" alt="${teacher.name}">
+                        </div>
+                        <div class="teacher-info">
+                            <h3>${teacher.name}</h3>
+                            <p>${teacher.subject}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // حدث النقر على المعلم
+                teacherCard.addEventListener('click', function() {
+                    showClassesByTeacher(teacher);
+                });
+                
+                teachersContainer.appendChild(teacherCard);
+            });
+        }
+
+        // عرض جميع الفصول
+        function renderClasses() {
+            const classesContainer = document.getElementById('classes-container');
+            const teacherTitle = document.getElementById('teacher-title');
+            
+            // تحديث العنوان
+            teacherTitle.textContent = `جميع الفصول الدراسية`;
+            
+            // إظهار قسم الفصول وإخفاء الأقسام الأخرى
+            showSection('classes-section');
+            
+            // مسح المحتوى السابق
+            classesContainer.innerHTML = '';
+            
+            // عرض الفصول
+            teacherData2026.teachers.forEach(teacher => {
+                teacher.classes.forEach((classItem, index) => {
+                    const classCard = document.createElement('div');
+                    classCard.className = 'class-card';
+                    
+                    classCard.innerHTML = `
+                        <i class="fas fa-book-open"></i>
+                        <h3>${classItem.name}</h3>
+                        <p>${teacher.name}</p>
+                        <div class="lectures-count">${classItem.lectures.length} محاضرة</div>
+                    `;
+                    
+                    // حدث النقر على الفصل
+                    classCard.addEventListener('click', function() {
+                        showLecturesByClass(teacher, classItem, index);
+                    });
+                    
+                    classesContainer.appendChild(classCard);
+                });
+            });
+        }
+
+        // عرض المعلمين حسب المادة الدراسية
+        function showTeachersBySubject(subjectName, teachers) {
+            const teachersContainer = document.getElementById('teachers-container');
+            const subjectTitle = document.getElementById('subject-title');
+            
+            // تحديث العنوان
+            subjectTitle.textContent = `معلمو مادة ${subjectName}`;
+            
+            // إظهار قسم المعلمين وإخفاء الأقسام الأخرى
+            showSection('teachers-section');
+            
+            // مسح المحتوى السابق
+            teachersContainer.innerHTML = '';
+            
+            // عرض المعلمين
+            teachers.forEach(teacher => {
+                const teacherCard = document.createElement('div');
+                teacherCard.className = 'teacher-card';
+                
+                teacherCard.innerHTML = `
+                    <div class="teacher-header">
+                        <div class="teacher-avatar">
+                            <img src="${teacher.image}" alt="${teacher.name}">
+                        </div>
+                        <div class="teacher-info">
+                            <h3>${teacher.name}</h3>
+                            <p>${teacher.subject}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // حدث النقر على المعلم
+                teacherCard.addEventListener('click', function() {
+                    showClassesByTeacher(teacher);
+                });
+                
+                teachersContainer.appendChild(teacherCard);
+            });
+        }
+
+        // عرض الفصول الدراسية حسب المعلم
+        function showClassesByTeacher(teacher) {
+            const classesContainer = document.getElementById('classes-container');
+            const teacherTitle = document.getElementById('teacher-title');
+            
+            // تحديث العنوان
+            teacherTitle.textContent = `فصول الأستاذ ${teacher.name}`;
+            
+            // إظهار قسم الفصول وإخفاء الأقسام الأخرى
+            showSection('classes-section');
+            
+            // مسح المحتوى السابق
+            classesContainer.innerHTML = '';
+            
+            // عرض الفصول
+            teacher.classes.forEach((classItem, index) => {
+                const classCard = document.createElement('div');
+                classCard.className = 'class-card';
+                
+                classCard.innerHTML = `
+                    <i class="fas fa-book-open"></i>
+                    <h3>${classItem.name}</h3>
+                    <div class="lectures-count">${classItem.lectures.length} محاضرة</div>
+                `;
+                
+                // حدث النقر على الفصل
+                classCard.addEventListener('click', function() {
+                    showLecturesByClass(teacher, classItem, index);
+                });
+                
+                classesContainer.appendChild(classCard);
+            });
+        }
+
+        // عرض المحاضرات حسب الفصل
+        function showLecturesByClass(teacher, classItem, classIndex) {
+            const lecturesContainer = document.getElementById('lectures-container');
+            const classTitle = document.getElementById('class-title');
+            
+            // تحديث العنوان
+            classTitle.textContent = `المحاضرات - ${classItem.name}`;
+            
+            // إظهار قسم المحاضرات وإخفاء الأقسام الأخرى
+            showSection('lectures-section');
+            
+            // مسح المحتوى السابق
+            lecturesContainer.innerHTML = '';
+            
+            // عرض المحاضرات
+            classItem.lectures.forEach(lecture => {
+                const lectureCard = document.createElement('div');
+                lectureCard.className = 'lecture-card';
+                
+                lectureCard.innerHTML = `
+                    <div class="lecture-thumb">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="lecture-content">
+                        <h3 class="lecture-title">${lecture.title}</h3>
+                        <div class="lecture-meta">
+                            <div class="lecture-duration">
+                                <i class="fas fa-clock"></i>
+                                <span>${lecture.duration || 'غير محدد'}</span>
+                            </div>
+                        </div>
+                        <button class="watch-btn" data-url="${lecture.url}" data-title="${lecture.title}">
+                            <i class="fas fa-play"></i> مشاهدة المحاضرة
+                        </button>
+                    </div>
+                `;
+                
+                // حدث النقر على مشاهدة المحاضرة
+                const watchBtn = lectureCard.querySelector('.watch-btn');
+                watchBtn.addEventListener('click', function() {
+                    playLecture(this.dataset.url, this.dataset.title);
+                });
+                
+                lecturesContainer.appendChild(lectureCard);
+            });
+        }
+
+        // تشغيل المحاضرة باستخدام البروكسي
+        function playLecture(url, title) {
+            const videoModal = document.getElementById('video-modal');
+            const videoPlayerContainer = document.getElementById('video-player');
+            const videoPlayer = document.getElementById('lecture-video');
+            const videoTitle = document.getElementById('video-title');
+            
+            // تحديث عنوان المحاضرة
+            videoTitle.textContent = title;
+            
+            // إظهار مشغل الفيديو
+            videoModal.classList.add('active');
+            
+            // تدمير مشغل HLS السابق
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+            
+            // إظهار رسالة التحميل
+            document.querySelector('.video-loading').style.display = 'block';
+            videoPlayer.style.display = 'none';
+            
+            // التحقق من توفر Hls
+            if (typeof Hls === 'undefined') {
+                alert('مكتبة تشغيل الفيديو غير محملة. يرجى تحديث الصفحة.');
+                return;
+            }
+            
+            // إعدادات Hls محسنة
+            hls = new Hls({
+                debug: false,
+                enableWorker: true,
+                maxBufferLength: 30,
+                backBufferLength: 15,
+                maxMaxBufferLength: 60,
+                maxBufferSize: 60 * 1000 * 1000, // 60MB
+                maxLoadingDelay: 4,
+                highBufferWatchdogPeriod: 2,
+                nudgeOffset: 0.1,
+                nudgeMaxRetry: 3,
+                manifestLoadingMaxRetry: 5,
+                manifestLoadingRetryDelay: 1000,
+                manifestLoadingMaxRetryTimeout: 5000,
+                levelLoadingMaxRetry: 5,
+                levelLoadingRetryDelay: 1000,
+                levelLoadingMaxRetryTimeout: 5000,
+                fragLoadingMaxRetry: 5,
+                fragLoadingRetryDelay: 1000,
+                fragLoadingMaxRetryTimeout: 5000,
+            });
+            
+            // بناء رابط البروكسي
+            const proxyUrl = `${PROXY_URL}?url=${encodeURIComponent(url)}`;
+            
+            if (Hls.isSupported()) {
+                hls.loadSource(proxyUrl);
+                hls.attachMedia(videoPlayer);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    // إخفاء رسالة التحميل وإظهار الفيديو
+                    document.querySelector('.video-loading').style.display = 'none';
+                    videoPlayer.style.display = 'block';
+                    
+                    // إعداد قائمة الجودة
+                    setupQualitySelector();
+                    
+                    // محاولة التشغيل التلقائي
+                    videoPlayer.play().catch(e => {
+                        console.error('التشغيل التلقائي فشل:', e);
+                    });
+                });
+                
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    console.error('HLS error:', data);
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                console.error('Network error, trying to recover');
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.error('Media error, trying to recover');
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                console.error('Fatal error, cannot recover');
+                                closeVideoPlayer();
+                                break;
+                        }
+                    }
+                });
+            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                // دعم Safari الأصلي
+                videoPlayer.src = proxyUrl;
+                videoPlayer.addEventListener('loadedmetadata', function() {
+                    document.querySelector('.video-loading').style.display = 'none';
+                    videoPlayer.style.display = 'block';
+                    videoPlayer.play().catch(e => {
+                        console.error('التشغيل التلقائي فشل:', e);
+                    });
+                });
+            } else {
+                alert('عذرًا، متصفحك لا يدعم تشغيل هذا النوع من الفيديوهات.');
+            }
+            
+            // إعداد عناصر التحكم
+            setupVideoControls();
+        }
+
+        // دالة لإعداد قائمة الجودة
+        function setupQualitySelector() {
+            if (!hls || !hls.levels || hls.levels.length === 0) return;
+            
+            const qualitySelect = document.getElementById('quality-select');
+            qualitySelect.innerHTML = '';
+            
+            // إضافة خيار التلقائي
+            const autoOption = document.createElement('option');
+            autoOption.value = 'auto';
+            autoOption.textContent = 'تلقائي';
+            autoOption.selected = true;
+            qualitySelect.appendChild(autoOption);
+            
+            // إضافة خيارات الجودة
+            hls.levels.forEach((level, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = level.height + 'p';
+                qualitySelect.appendChild(option);
+            });
+            
+            // تغيير الجودة عند تغيير الاختيار
+            qualitySelect.addEventListener('change', function() {
+                if (this.value === 'auto') {
+                    hls.currentLevel = -1;
+                } else {
+                    hls.currentLevel = parseInt(this.value);
+                }
+            });
+        }
+
+        // إغلاق مشغل الفيديو
+        function closeVideoPlayer() {
+            const videoModal = document.getElementById('video-modal');
+            const videoPlayer = document.getElementById('lecture-video');
+            
+            videoPlayer.pause();
+            videoModal.classList.remove('active');
+            
+            // تدمير مشغل HLS عند الإغلاق
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+        }
+
+        // إعداد عناصر التحكم بالفيديو
+        function setupVideoControls() {
+            const video = document.getElementById('lecture-video');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const rewindBtn = document.getElementById('rewind-btn');
+            const forwardBtn = document.getElementById('forward-btn');
+            const speedSelect = document.getElementById('speed-select');
+            const volumeBtn = document.getElementById('volume-btn');
+            const volumeSlider = document.getElementById('volume-slider');
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const closeBtn = document.getElementById('close-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.querySelector('.progress-container');
+            const progressTime = document.getElementById('progress-time');
+            
+            // زر التشغيل/الإيقاف المؤقت
+            playPauseBtn.addEventListener('click', function() {
+                if (video.paused) {
+                    video.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    video.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+            
+            // تحديث أيقونة التشغيل/الإيقاف
+            video.addEventListener('play', function() {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            });
+            
+            video.addEventListener('pause', function() {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+            
+            // الترجيع 10 ثواني
+            rewindBtn.addEventListener('click', function() {
+                video.currentTime -= 10;
+            });
+            
+            // التقديم 10 ثواني
+            forwardBtn.addEventListener('click', function() {
+                video.currentTime += 10;
+            });
+            
+            // تغيير سرعة التشغيل
+            speedSelect.addEventListener('change', function() {
+                video.playbackRate = parseFloat(this.value);
+            });
+            
+            // التحكم في مستوى الصوت
+            volumeSlider.addEventListener('input', function() {
+                video.volume = this.value;
+                if (this.value > 0) {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                } else {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                }
+            });
+            
+            // كتم الصوت
+            volumeBtn.addEventListener('click', function() {
+                if (video.volume > 0) {
+                    video.volume = 0;
+                    volumeSlider.value = 0;
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    video.volume = 1;
+                    volumeSlider.value = 1;
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
+            
+            // وضع ملء الشاشة
+            fullscreenBtn.addEventListener('click', function() {
+                const videoContainer = document.querySelector('.video-container');
+                if (!document.fullscreenElement) {
+                    if (videoContainer.requestFullscreen) {
+                        videoContainer.requestFullscreen();
+                    } else if (videoContainer.mozRequestFullScreen) {
+                        videoContainer.mozRequestFullScreen();
+                    } else if (videoContainer.webkitRequestFullscreen) {
+                        videoContainer.webkitRequestFullscreen();
+                    } else if (videoContainer.msRequestFullscreen) {
+                        videoContainer.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            });
+            
+            // زر إغلاق الفيديو
+            closeBtn.addEventListener('click', function() {
+                closeVideoPlayer();
+            });
+            
+            // شريط التقدم
+            video.addEventListener('timeupdate', function() {
+                if (video.duration) {
+                    const percent = (video.currentTime / video.duration) * 100;
+                    progressBar.style.width = `${percent}%`;
+                }
+            });
+            
+            // النقر على شريط التقدم
+            progressContainer.addEventListener('click', function(e) {
+                if (video.duration) {
+                    const rect = this.getBoundingClientRect();
+                    const pos = (e.clientX - rect.left) / rect.width;
+                    video.currentTime = pos * video.duration;
+                }
+            });
+            
+            // عرض وقت التقدم عند تحريك الماوس
+            progressContainer.addEventListener('mousemove', function(e) {
+                if (video.duration) {
+                    const rect = this.getBoundingClientRect();
+                    const pos = (e.clientX - rect.left) / rect.width;
+                    const time = pos * video.duration;
+                    
+                    // تحويل الوقت إلى دقائق وثواني
+                    const minutes = Math.floor(time / 60);
+                    const seconds = Math.floor(time % 60);
+                    
+                    progressTime.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    progressTime.style.left = `${e.clientX - rect.left}px`;
+                }
+            });
+        }
+
+        // وظيفة البحث
+        function searchContent() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            if (!searchTerm) return;
+            
+            // جمع نتائج البحث
+            const results = {
+                teachers: [],
+                classes: [],
+                lectures: []
+            };
+            
+            // البحث في المعلمين
+            teacherData2026.teachers.forEach(teacher => {
+                if (teacher.name.toLowerCase().includes(searchTerm) || 
+                    teacher.subject.toLowerCase().includes(searchTerm)) {
+                    results.teachers.push(teacher);
+                }
+                
+                // البحث في الفصول
+                teacher.classes.forEach(classItem => {
+                    if (classItem.name.toLowerCase().includes(searchTerm)) {
+                        results.classes.push({
+                            teacher,
+                            classItem
+                        });
+                    }
+                    
+                    // البحث في المحاضرات
+                    classItem.lectures.forEach(lecture => {
+                        if (lecture.title.toLowerCase().includes(searchTerm) || 
+                            (lecture.description && lecture.description.toLowerCase().includes(searchTerm))) {
+                            results.lectures.push({
+                                teacher,
+                                classItem,
+                                lecture
+                            });
+                        }
+                    });
+                });
+            });
+            
+            // عرض نتائج البحث
+            displaySearchResults(results);
+        }
+
+        // عرض نتائج البحث
+        function displaySearchResults(results) {
+            // إظهار قسم المعلمين وإخفاء الأقسام الأخرى
+            showSection('teachers-section');
+            
+            const teachersContainer = document.getElementById('teachers-container');
+            const subjectTitle = document.getElementById('subject-title');
+            
+            // تحديث العنوان
+            subjectTitle.textContent = `نتائج البحث`;
+            
+            // مسح المحتوى السابق
+            teachersContainer.innerHTML = '';
+            
+            // عرض نتائج البحث
+            if (results.teachers.length > 0) {
+                const heading = document.createElement('h3');
+                heading.textContent = 'المعلمون:';
+                heading.style.margin = '20px 0';
+                heading.style.color = 'var(--primary)';
+                teachersContainer.appendChild(heading);
+                
+                results.teachers.forEach(teacher => {
+                    const teacherCard = document.createElement('div');
+                    teacherCard.className = 'teacher-card';
+                    
+                    teacherCard.innerHTML = `
+                        <div class="teacher-header">
+                            <div class="teacher-avatar">
+                                <img src="${teacher.image}" alt="${teacher.name}">
+                            </div>
+                            <div class="teacher-info">
+                                <h3>${teacher.name}</h3>
+                                <p>${teacher.subject}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    teachersContainer.appendChild(teacherCard);
+                });
+            }
+            
+            if (results.classes.length > 0) {
+                const heading = document.createElement('h3');
+                heading.textContent = 'الفصول الدراسية:';
+                heading.style.margin = '20px 0';
+                heading.style.color = 'var(--primary)';
+                teachersContainer.appendChild(heading);
+                
+                results.classes.forEach(result => {
+                    const classCard = document.createElement('div');
+                    classCard.className = 'class-card';
+                    
+                    classCard.innerHTML = `
+                        <i class="fas fa-book-open"></i>
+                        <h3>${result.classItem.name}</h3>
+                        <p>${result.teacher.name}</p>
+                        <div class="lectures-count">${result.classItem.lectures.length} محاضرة</div>
+                    `;
+                    
+                    teachersContainer.appendChild(classCard);
+                });
+            }
+            
+            if (results.lectures.length > 0) {
+                const heading = document.createElement('h3');
+                heading.textContent = 'المحاضرات:';
+                heading.style.margin = '20px 0';
+                heading.style.color = 'var(--primary)';
+                teachersContainer.appendChild(heading);
+                
+                results.lectures.forEach(result => {
+                    const lectureCard = document.createElement('div');
+                    lectureCard.className = 'lecture-card';
+                    
+                    lectureCard.innerHTML = `
+                        <div class="lecture-thumb">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="lecture-content">
+                            <h3 class="lecture-title">${result.lecture.title}</h3>
+                            <div class="lecture-meta">
+                                <div class="lecture-duration">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${result.lecture.duration || 'غير محدد'}</span>
+                                </div>
+                            </div>
+                            <button class="watch-btn" data-url="${result.lecture.url}" data-title="${result.lecture.title}">
+                                <i class="fas fa-play"></i> مشاهدة المحاضرة
+                            </button>
+                        </div>
+                    `;
+                    
+                    const watchBtn = lectureCard.querySelector('.watch-btn');
+                    watchBtn.addEventListener('click', function() {
+                        playLecture(this.dataset.url, this.dataset.title);
+                    });
+                    
+                    teachersContainer.appendChild(lectureCard);
+                });
+            }
+            
+            if (results.teachers.length === 0 && results.classes.length === 0 && results.lectures.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.innerHTML = `
+                    <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <h3>لا توجد نتائج</h3>
+                    <p>لم نعثر على أي نتائج تطابق بحثك</p>
+                `;
+                teachersContainer.appendChild(noResults);
+            }
+        }
+
+        // تبديل القائمة المتنقلة
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+        
+        // بيانات مؤقتة لأغراض العرض
+        const teacherData2026 = {
+            teachers: [
+                {
+                    "id": 1,
+                    "name": "حسين محمد 2026",
+                    "subject": "مدرس مادة الفيزياء",
+                    "image": "https://via.placeholder.com/70",
+                    "classes": [
+                        {
+                            "name": "الفصل الاول: المتسعات",
+                            "lectures": [
+                                {
+                                    "title": "اساسيات الفيزياء",
+                                    "description": "مقدمة في الفيزياء الحديثة",
+                                    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+                                },
+                                {
+                                    "title": "محاضرة 1",
+                                    "description": "المتسعات الكهربائية",
+                                    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "name": "حيدر عبدالائمة 2026",
+                    "subject": "مدرس مادة الرياضيات",
+                    "image": "https://via.placeholder.com/70",
+                    "classes": [
+                        {
+                            "name": "الفصل الاول: الاعداد المركبة",
+                            "lectures": [
+                                {
+                                    "title": "المحاضرة التعريفية",
+                                    "description": "مقدمة في الأعداد المركبة",
+                                    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+    </script>
 </body>
 </html>
