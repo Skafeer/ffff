@@ -488,69 +488,21 @@ footer {
 }
 
 .video-player {
+    position: relative;
     width: 100%;
     background: #000;
+    min-height: 300px;
 }
 
-.video-player video {
-    width: 100%;
-    display: block;
-}
-
-.video-controls {
-    padding: 15px;
-    background: #f5f5f5;
-}
-
-.control-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.control-btn {
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    margin: 0 5px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.control-select {
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    margin-left: 10px;
-}
-
-.progress-container {
-    height: 5px;
-    background: #ddd;
-    margin-top: 10px;
-    position: relative;
-    cursor: pointer;
-}
-
-.progress-bar {
-    height: 100%;
-    background: #3498db;
-    width: 0%;
-}
-
-.progress-time {
+/* رسالة التحميل */
+.video-loading {
     position: absolute;
-    top: -25px;
-    background: rgba(0, 0, 0, 0.7);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     color: white;
-    padding: 3px 5px;
-    border-radius: 3px;
-    display: none;
-}
-
-.progress-container:hover .progress-time {
-    display: block;
+    font-size: 20px;
+    z-index: 10;
 }
 
 /* نتائج البحث */
@@ -558,4 +510,88 @@ footer {
     text-align: center;
     padding: 50px 0;
     color: #777;
+}
+
+/* تحسينات للقائمة المتنقلة */
+.mobile-menu {
+    display: none;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu {
+        display: block;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: #fff;
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        display: none;
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+}
+
+/* تحسينات للمواد الدراسية */
+.subject-card:hover, .teacher-card:hover, .class-card:hover, .lecture-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.watch-btn:hover {
+    background: #2980b9;
+}
+
+/* أنماط Plyr */
+.plyr {
+    border-radius: 8px;
+    direction: ltr;
+}
+
+.plyr__controls {
+    direction: rtl;
+}
+
+.plyr__menu__container .plyr__control {
+    text-align: right;
+}
+
+.plyr__controls__item.plyr__progress__container {
+    width: 100%;
+}
+
+.plyr--full-ui input[type="range"] {
+    color: #3498db;
+}
+
+.plyr__control--overlaid {
+    background: rgba(52, 152, 219, 0.8);
+}
+
+.plyr__control--overlaid:hover {
+    background: #3498db;
+}
+
+.plyr--video .plyr__control.plyr__tab-focus,
+.plyr--video .plyr__control:hover,
+.plyr--video .plyr__control[aria-expanded="true"] {
+    background: #3498db;
+}
+
+/* رسالة الخطأ */
+.error-message {
+    color: #e74c3c;
+    padding: 15px;
+    background: #fdeded;
+    border-radius: 5px;
+    margin: 10px 0;
+    text-align: center;
 }
