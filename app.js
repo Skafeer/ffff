@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // متغيرات عالمية
-const PROXY_URL = "https://ion-academy-proxy.workers.dev"; // استبدل برابط البروكسي الخاص بك
+const PROXY_URL = "https://abwaab-proxy.ss9758026.workers.dev/"; // استبدل برابط البروكسي الخاص بك
 let currentHls = null;
 
 // إعداد مستمعي الأحداث
