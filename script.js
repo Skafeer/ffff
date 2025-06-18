@@ -6,12 +6,12 @@ const lectures = [
   {
     id: 1,
     title: 'محاضرة 1',
-    url: 'https://abwaab.com/path/to/lecture1.m3u8'
+    url: 'https://vz-99e5c202-ca5.b-cdn.net/7f2873a8-c450-4db3-819a-1cfc518c23f8/1080p/video.m3u8'
   },
   {
     id: 2,
     title: 'محاضرة 2',
-    url: 'https://abwaab.com/path/to/lecture2.m3u8'
+    url: 'https://vz-99e5c202-ca5.b-cdn.net/7f2873a8-c450-4db3-819a-1cfc518c23f8/1080p/video.m3u8'
   }
 ];
 
