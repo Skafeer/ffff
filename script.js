@@ -25,11 +25,11 @@ function playLecture(originalUrl) {
 
   if (Hls.isSupported()) {
     window.hls = new Hls({
-      xhrSetup: function(xhr, url) {
-        const proxied = PROXY_BASE + encodeURIComponent(url);
-        xhr.open('GET', proxied, true);
-      }
-    });
+    window.hls = new Hls({
+  xhrSetup: function(xhr, url) {
+    xhr.open('GET', PROXY_BASE + url, true);  // بدون encodeURIComponent
+  }
+});
 
     window.hls.loadSource(proxiedUrl);
     window.hls.attachMedia(videoEl);
