@@ -16,16 +16,30 @@ lectures.forEach(lec => {
 });
 
 function playLecture(originalUrl) {
-  const proxiedUrl = PROXY_BASE + encodeURIComponent(originalUrl);
   const videoEl = document.getElementById('video');
+  const proxiedUrl = PROXY_BASE + encodeURIComponent(originalUrl);
+
   if (window.hls) {
     window.hls.destroy();
   }
+
   if (Hls.isSupported()) {
-    window.hls = new Hls();
+    window.hls = new Hls({
+      xhrSetup: function(xhr, url) {
+        const proxied = PROXY_BASE + encodeURIComponent(url);
+        xhr.open('GET', proxied, true);
+      }
+    });
+
     window.hls.loadSource(proxiedUrl);
     window.hls.attachMedia(videoEl);
-    window.hls.on(Hls.Events.MANIFEST_PARSED, () => videoEl.play());
+    window.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      videoEl.play();
+    });
+
+    window.hls.on(Hls.Events.ERROR, function (event, data) {
+      console.error('HLS.js error', data);
+    });
   } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
     videoEl.src = proxiedUrl;
     videoEl.play();
